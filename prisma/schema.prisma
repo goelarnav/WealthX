@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RecommendationStatus {
+  OPEN
+  CLOSED
+}
+
+enum OtpPurpose {
+  SIGNUP
+  RESET_PIN
+}
+
+/// Application user. Authenticates with phone + 4-digit PIN after an
+/// initial OTP-verified signup. PINs are hashed, never stored in plain text.
+model User {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  name      String
+  pinHash   String
+
+  // Lightweight brute-force protection for the 4-digit PIN (low entropy by
+  // design), enforced in lib/auth alongside per-request rate limiting.
+  failedPinAttempts Int       @default(0)
+  lockedUntil       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+/// A single OTP challenge (signup verification or PIN reset). The code is
+/// hashed and single-use, with an expiry and a capped number of attempts.
+model OtpChallenge {
+  id         String     @id @default(cuid())
+  phone      String
+  purpose    OtpPurpose
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int        @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@index([phone, purpose])
+  @@map("otp_challenges")
+}
+
+/// A stock recommendation shared with the group. Only source-of-truth facts
+/// are persisted here — derived figures (gain %, days held, open/closed
+/// framing) are computed from these fields in lib/recommendations, so they
+/// can never drift out of sync with the underlying prices/dates.
+model StockRecommendation {
+  id          String               @id @default(cuid())
+  companyName String
+  nseCode     String
+
+  purchasePrice    Decimal  @db.Decimal(10, 2)
+  currentPrice     Decimal  @db.Decimal(10, 2)
+  dayChangePercent Decimal? @db.Decimal(6, 2)
+  purchaseDate     DateTime
+
+  status RecommendationStatus @default(OPEN)
+
+  sellDate  DateTime?
+  sellPrice Decimal?  @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([nseCode])
+  @@map("stock_recommendations")
+}
