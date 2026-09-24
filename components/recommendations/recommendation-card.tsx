@@ -1,12 +1,18 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Briefcase } from "lucide-react";
 import { formatInr, formatPercent, formatDate } from "@/lib/format";
 import { getGainPercent, getHoldingDays, isClosed } from "@/lib/recommendations/derive";
 import type { Recommendation } from "@/lib/recommendations/types";
 import { StatusBadge } from "@/components/recommendations/status-badge";
 import { GainPill } from "@/components/recommendations/gain-pill";
 
-export function RecommendationCard({ recommendation: rec }: { recommendation: Recommendation }) {
+export function RecommendationCard({
+  recommendation: rec,
+  invested,
+}: {
+  recommendation: Recommendation;
+  invested?: boolean;
+}) {
   const closed = isClosed(rec);
   const displayPrice = closed && rec.sellPrice != null ? rec.sellPrice : rec.currentPrice;
 
@@ -17,7 +23,12 @@ export function RecommendationCard({ recommendation: rec }: { recommendation: Re
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate font-medium text-foreground">{rec.companyName}</p>
+          <p className="flex items-center gap-1.5 truncate font-medium text-foreground">
+            {rec.companyName}
+            {invested ? (
+              <Briefcase className="size-3.5 shrink-0 text-teal-600" aria-label="You've invested in this" />
+            ) : null}
+          </p>
           <p className="text-xs text-muted-foreground">{rec.nseCode}</p>
         </div>
         <StatusBadge status={rec.status} className="shrink-0" />

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "prices:refresh": "tsx scripts/refresh-prices.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

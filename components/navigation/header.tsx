@@ -14,6 +14,7 @@ export function Header({ name, phone }: { name: string; phone: string }) {
           </Link>
           <nav className="hidden items-center gap-6 md:flex">
             <NavLink href="/dashboard">Recommendations</NavLink>
+            <NavLink href="/portfolio">My Stocks</NavLink>
             <MoreMenu />
           </nav>
         </div>

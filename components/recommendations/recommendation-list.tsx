@@ -8,7 +8,13 @@ import { RecommendationTable } from "@/components/recommendations/recommendation
 import { RecommendationCard } from "@/components/recommendations/recommendation-card";
 import { EmptyState } from "@/components/recommendations/empty-state";
 
-export function RecommendationList({ recommendations }: { recommendations: Recommendation[] }) {
+export function RecommendationList({
+  recommendations,
+  investedRecommendationIds = [],
+}: {
+  recommendations: Recommendation[];
+  investedRecommendationIds?: string[];
+}) {
   const [filter, setFilter] = useState<StatusFilter>("ALL");
   const [query, setQuery] = useState("");
 
@@ -16,6 +22,7 @@ export function RecommendationList({ recommendations }: { recommendations: Recom
     () => filterRecommendations(recommendations, filter, query),
     [recommendations, filter, query],
   );
+  const investedSet = useMemo(() => new Set(investedRecommendationIds), [investedRecommendationIds]);
 
   return (
     <div className="space-y-4">
@@ -31,10 +38,10 @@ export function RecommendationList({ recommendations }: { recommendations: Recom
         />
       ) : (
         <>
-          <RecommendationTable recommendations={filtered} />
+          <RecommendationTable recommendations={filtered} investedIds={investedSet} />
           <div className="space-y-3 md:hidden">
             {filtered.map((rec) => (
-              <RecommendationCard key={rec.id} recommendation={rec} />
+              <RecommendationCard key={rec.id} recommendation={rec} invested={investedSet.has(rec.id)} />
             ))}
           </div>
         </>

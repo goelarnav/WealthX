@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getAllRecommendations } from "@/lib/recommendations/repository";
 import { summarizeRecommendations } from "@/lib/recommendations/derive";
+import { requireUser } from "@/lib/auth/session";
+import { getActiveInvestmentsByRecommendation } from "@/lib/investments/repository";
 import { SummaryCards } from "@/components/recommendations/summary-cards";
 import { RecommendationList } from "@/components/recommendations/recommendation-list";
 import { Reveal } from "@/components/motion/reveal";
@@ -8,8 +10,13 @@ import { Reveal } from "@/components/motion/reveal";
 export const metadata: Metadata = { title: "Recommendations — WealthX" };
 
 export default async function DashboardPage() {
-  const recommendations = await getAllRecommendations();
+  const user = await requireUser();
+  const [recommendations, activeInvestments] = await Promise.all([
+    getAllRecommendations(),
+    getActiveInvestmentsByRecommendation(user.id),
+  ]);
   const summary = summarizeRecommendations(recommendations);
+  const investedRecommendationIds = [...activeInvestments.keys()];
 
   return (
     <div className="space-y-6">
@@ -27,7 +34,7 @@ export default async function DashboardPage() {
       </Reveal>
 
       <Reveal delay={0.1}>
-        <RecommendationList recommendations={recommendations} />
+        <RecommendationList recommendations={recommendations} investedRecommendationIds={investedRecommendationIds} />
       </Reveal>
     </div>
   );

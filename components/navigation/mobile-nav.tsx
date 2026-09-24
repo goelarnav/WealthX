@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { Home, LayoutGrid, User } from "lucide-react";
+import { Home, Briefcase, LayoutGrid, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/dashboard", label: "Home", icon: Home, match: ["/dashboard", "/recommendations"] },
+  { href: "/portfolio", label: "My Stocks", icon: Briefcase, match: ["/portfolio"] },
   { href: "/calculators", label: "More", icon: LayoutGrid, match: ["/calculators"] },
   { href: "/profile", label: "Profile", icon: User, match: ["/profile"] },
 ];

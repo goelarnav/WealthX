@@ -16,6 +16,11 @@ enum OtpPurpose {
   RESET_PIN
 }
 
+enum InvestmentStatus {
+  ACTIVE
+  EXITED
+}
+
 /// Application user. Authenticates with phone + 4-digit PIN after an
 /// initial OTP-verified signup. PINs are hashed, never stored in plain text.
 model User {
@@ -31,6 +36,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  investments Investment[]
 
   @@map("users")
 }
@@ -73,7 +80,41 @@ model StockRecommendation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  investments Investment[]
+
   @@index([status])
   @@index([nseCode])
   @@map("stock_recommendations")
+}
+
+/// A user's personal position in a recommendation. Independent of the
+/// master recommendation's own lifecycle: a user chooses their own entry
+/// amount and can exit at their own price/date, since this records what
+/// actually happened for them (e.g. via their own broker), not a mirror of
+/// the admin's timeline. Gain %/current value are derived from `amount` +
+/// `entryPrice` vs. either the recommendation's live price (ACTIVE) or
+/// `exitPrice` (EXITED) — never stored, same rule as StockRecommendation.
+model Investment {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  recommendationId String
+  recommendation   StockRecommendation @relation(fields: [recommendationId], references: [id], onDelete: Restrict)
+
+  amount     Decimal  @db.Decimal(12, 2)
+  entryPrice Decimal  @db.Decimal(10, 2)
+  entryDate  DateTime @default(now())
+
+  status InvestmentStatus @default(ACTIVE)
+
+  exitPrice Decimal?  @db.Decimal(10, 2)
+  exitDate  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([recommendationId])
+  @@map("investments")
 }

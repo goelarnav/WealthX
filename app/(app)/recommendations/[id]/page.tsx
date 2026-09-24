@@ -5,9 +5,12 @@ import { ArrowLeft } from "lucide-react";
 import { getRecommendationById } from "@/lib/recommendations/repository";
 import { getGainPercent, getHoldingDays, isClosed } from "@/lib/recommendations/derive";
 import { formatInr, formatPercent, formatDate } from "@/lib/format";
+import { requireUser } from "@/lib/auth/session";
+import { getActiveInvestmentFor } from "@/lib/investments/repository";
 import { StatusBadge } from "@/components/recommendations/status-badge";
 import { GainPill } from "@/components/recommendations/gain-pill";
 import { Timeline } from "@/components/recommendations/timeline";
+import { InvestmentPanel } from "@/components/investments/investment-panel";
 import { Reveal } from "@/components/motion/reveal";
 
 export async function generateMetadata({
@@ -35,9 +38,11 @@ export default async function RecommendationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const user = await requireUser();
   const rec = await getRecommendationById(id);
   if (!rec) notFound();
 
+  const activeInvestment = await getActiveInvestmentFor(user.id, id);
   const closed = isClosed(rec);
   const exitPrice = closed && rec.sellPrice != null ? rec.sellPrice : rec.currentPrice;
   const gainPercent = getGainPercent(rec);
@@ -82,6 +87,16 @@ export default async function RecommendationDetailPage({
       </Reveal>
 
       <Reveal delay={0.05}>
+        <InvestmentPanel
+          recommendationId={rec.id}
+          companyName={rec.companyName}
+          currentPrice={rec.currentPrice}
+          recommendationStatus={rec.status}
+          activeInvestment={activeInvestment}
+        />
+      </Reveal>
+
+      <Reveal delay={0.1}>
         <div className="rounded-2xl border bg-card p-5 sm:p-6">
           <h2 className="mb-1 text-sm font-semibold text-foreground">Recommendation Timeline</h2>
           <p className="mb-5 text-xs text-muted-foreground">
@@ -91,7 +106,7 @@ export default async function RecommendationDetailPage({
         </div>
       </Reveal>
 
-      <Reveal delay={0.1}>
+      <Reveal delay={0.15}>
         <div className="rounded-2xl border bg-card p-5 sm:p-6">
           <h2 className="mb-1 text-sm font-semibold text-foreground">Details</h2>
           <div className="divide-y">

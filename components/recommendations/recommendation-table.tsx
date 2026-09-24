@@ -1,14 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Briefcase } from "lucide-react";
 import { formatInr, formatPercent } from "@/lib/format";
 import { getGainPercent, getHoldingDays, isClosed } from "@/lib/recommendations/derive";
 import type { Recommendation } from "@/lib/recommendations/types";
 import { StatusBadge } from "@/components/recommendations/status-badge";
 import { GainPill } from "@/components/recommendations/gain-pill";
 
-export function RecommendationTable({ recommendations }: { recommendations: Recommendation[] }) {
+export function RecommendationTable({
+  recommendations,
+  investedIds,
+}: {
+  recommendations: Recommendation[];
+  investedIds?: Set<string>;
+}) {
   const router = useRouter();
 
   return (
@@ -44,7 +50,12 @@ export function RecommendationTable({ recommendations }: { recommendations: Reco
                 className="cursor-pointer transition-colors hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
               >
                 <td className="px-4 py-3">
-                  <p className="font-medium text-foreground">{rec.companyName}</p>
+                  <p className="flex items-center gap-1.5 font-medium text-foreground">
+                    {rec.companyName}
+                    {investedIds?.has(rec.id) ? (
+                      <Briefcase className="size-3.5 shrink-0 text-teal-600" aria-label="You've invested in this" />
+                    ) : null}
+                  </p>
                   <p className="text-xs text-muted-foreground">{rec.nseCode}</p>
                 </td>
                 <td className="px-4 py-3 text-right text-foreground">{formatInr(rec.purchasePrice)}</td>

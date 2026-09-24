@@ -1,7 +1,8 @@
 # WealthX
 
 A stock-recommendation platform: phone + PIN authentication, a recommendations
-dashboard, and a "More" section of placeholder financial calculators.
+dashboard with live market prices, a personal "My Stocks" portfolio, and a
+"More" section of placeholder financial calculators.
 
 ## Tech stack
 
@@ -10,6 +11,7 @@ dashboard, and a "More" section of placeholder financial calculators.
 - **Animation:** [Motion](https://motion.dev)
 - **Database:** PostgreSQL via Prisma (driver adapter: `@prisma/adapter-pg`)
 - **Auth:** phone + OTP (mocked) → 4-digit PIN, signed JWT session cookie (`jose`)
+- **Live prices:** Yahoo Finance's unofficial quote endpoint (no API key)
 
 ## Getting started
 
@@ -37,6 +39,7 @@ cp .env.example .env
 ```bash
 npm run db:migrate   # creates tables from prisma/schema.prisma
 npm run db:seed       # loads demo recommendations
+npm run prices:refresh  # optional: pull live CMPs from Yahoo Finance now
 ```
 
 ### 5. Run the dev server
@@ -58,6 +61,8 @@ console, so no SMS provider is needed to test the flow.
 | `AUTH_SECRET` | Random secret used to sign session/verification cookies (`openssl rand -hex 32`) |
 | `OTP_PROVIDER` | `mock` (default) or a real provider id once one is wired up in `lib/auth/otp-provider.ts` |
 | `OTP_TTL_SECONDS` | How long an OTP stays valid (default 300) |
+| `MARKET_DATA_PROVIDER` | `yahoo` (default, no key needed) — see `lib/market/price-provider.ts` |
+| `MARKET_REFRESH_SECRET` | Bearer token a scheduler must send to `POST /api/market/refresh` |
 
 ## Project structure
 
@@ -65,15 +70,18 @@ console, so no SMS provider is needed to test the flow.
 app/
   login/                  phone + PIN login, "forgot PIN" wizard
   signup/                 phone → OTP → create-profile wizard
+  api/market/refresh/     cron-facing endpoint that pulls live CMPs
   (app)/                  authenticated shell (header, mobile nav)
     dashboard/            main recommendations dashboard
-    recommendations/[id]/ recommendation detail + timeline
+    recommendations/[id]/ recommendation detail + timeline + invest/exit
+    portfolio/            "My Stocks" — personal positions + history
     profile/              profile view/edit, change PIN, logout
     calculators/          "More" section: overview + 6 placeholder pages
 components/
   auth/                   phone/OTP/PIN inputs, wizards, auth shell
   navigation/             header, mobile bottom nav, "More" dropdown, user menu
   recommendations/        summary cards, filters, table (desktop), cards (mobile)
+  investments/            invest/exit dialogs, position panel, portfolio list
   profile/                edit-profile and change-PIN dialogs
   calculators/            shared "coming soon" placeholder
   motion/                 small Motion wrappers (page reveal, step transitions)
@@ -82,11 +90,15 @@ lib/
   auth/                   OTP issuing/verification, PIN hashing, sessions, rate limiting
   db/                     Prisma client
   recommendations/        repository (Prisma) + derived-value helpers (gain %, days held)
-  validators/             zod schemas for phone/OTP/PIN/name
+  investments/            repository + derived-value helpers (P&L, holding days)
+  market/                 price-provider abstraction, Yahoo Finance client, refresh job
+  validators/             zod schemas for phone/OTP/PIN/name/amount
   calculators.ts          single source of truth for the 6 calculator routes
 prisma/
   schema.prisma
   seed.ts
+scripts/
+  refresh-prices.ts       manual/cron entry point for the price refresh job
 ```
 
 ## Architecture notes
@@ -113,10 +125,38 @@ repository (`lib/recommendations/repository.ts`) already exposes
 `importRecommendations` — no admin UI yet, but the seams are there for one,
 and for a future Excel/CSV import.
 
+**Personal investments ("My Stocks").** A recommendation is one shared,
+admin-owned record; an `Investment` is a user's own position in it, and the
+two are deliberately independent. Investing snapshots `entryPrice` from the
+recommendation's live price at that moment and takes a ₹ `amount` — no
+share-quantity math. Exiting is a separate action where the user types
+*their own* exit price/date (not necessarily today's market price), because
+this records what actually happened for them (e.g. via their real broker),
+not a mirror of the admin's recommendation lifecycle — so a position stays
+exitable even after an admin closes the underlying recommendation, and nothing
+auto-closes it. Same rule as recommendations: gain %, current value, and
+holding days are derived in `lib/investments/derive.ts`, never stored.
+
+**Live prices.** `lib/market/price-provider.ts` is a `PriceProvider`
+interface (same shape as the OTP provider) so a paid vendor can replace
+Yahoo later without touching callers. `lib/market/refresh-prices.ts` pulls a
+quote per OPEN recommendation's NSE code and writes it through the existing
+`updateCurrentPrice()` — the dashboard only ever reads from the DB, it never
+calls out to Yahoo itself, so page loads don't depend on a third party's
+uptime. Two ways to run it: `npm run prices:refresh` (manual/local), or
+`POST /api/market/refresh` with `Authorization: Bearer $MARKET_REFRESH_SECRET`
+(what an external scheduler — cron, GitHub Actions, Vercel Cron — should
+hit every few minutes during market hours; none is configured in this repo).
+Yahoo's endpoint is unofficial and undocumented — every failure mode
+resolves to skipping that one symbol for the cycle rather than throwing, so
+one bad symbol can't take down the rest of the refresh.
+
 ## What's not implemented yet
 
 - Calculator logic (SIP/SWP/brokerage/margin/credit/pricing pages are
   placeholders by design — see spec)
 - Admin UI for managing recommendations (backend supports it; see above)
 - Real SMS provider (swap into `lib/auth/otp-provider.ts`)
-- Live market data / price history / charts
+- An actual scheduler calling `/api/market/refresh` (the endpoint and script
+  exist; nothing cron's it yet)
+- Price history / charts (only the latest CMP is kept, not a time series)
