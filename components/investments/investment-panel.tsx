@@ -22,7 +22,7 @@ export function InvestmentPanel({
   if (!activeInvestment) {
     if (recommendationStatus === "CLOSED") {
       return (
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
+        <div className="rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
           <h2 className="mb-1 text-sm font-semibold text-foreground">Your position</h2>
           <p className="text-sm text-muted-foreground">
             This recommendation is closed and no longer open to new investments.
@@ -32,7 +32,7 @@ export function InvestmentPanel({
     }
 
     return (
-      <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Your position</h2>
           <p className="text-sm text-muted-foreground">You haven&rsquo;t invested in this recommendation yet.</p>
@@ -46,7 +46,7 @@ export function InvestmentPanel({
   const currentValue = getCurrentValue(activeInvestment);
 
   return (
-    <div className="rounded-2xl border bg-card p-5 sm:p-6">
+    <div className="rounded-2xl border bg-gradient-to-br from-card to-teal-50/50 p-5 shadow-sm sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <h2 className="text-sm font-semibold text-foreground">Your position</h2>
         <GainPill value={gainPercent} />

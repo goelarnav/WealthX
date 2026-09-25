@@ -15,7 +15,7 @@ export function InvestmentCard({ investment }: { investment: Investment }) {
   return (
     <Link
       href={`/recommendations/${investment.recommendationId}`}
-      className="block rounded-xl border bg-card p-4 transition-colors hover:bg-muted/40"
+      className="block rounded-xl border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

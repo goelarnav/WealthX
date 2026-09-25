@@ -18,7 +18,7 @@ function MaskedSlot({ index, className }: { index: number; className?: string })
       )}
     >
       {slot?.char ? (
-        <span className="size-2.5 rounded-full bg-foreground" aria-hidden />
+        <span className="size-2.5 rounded-full bg-teal-600" aria-hidden />
       ) : null}
       {slot?.hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">

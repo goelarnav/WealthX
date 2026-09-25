@@ -28,10 +28,10 @@ export default async function ProfilePage() {
       <h1 className="text-2xl font-semibold tracking-tight text-foreground">Profile</h1>
 
       <Reveal>
-        <div className="rounded-2xl border bg-card p-6">
+        <div className="rounded-2xl border bg-card p-6 shadow-sm">
           <div className="flex items-center gap-4">
-            <Avatar className="size-14">
-              <AvatarFallback className="bg-teal-100 text-lg font-semibold text-teal-800">
+            <Avatar className="size-14 ring-2 ring-teal-100 ring-offset-2">
+              <AvatarFallback className="bg-gradient-to-br from-teal-100 to-teal-200 text-lg font-semibold text-teal-800">
                 {initials(user.name)}
               </AvatarFallback>
             </Avatar>

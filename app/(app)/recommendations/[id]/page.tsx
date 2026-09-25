@@ -59,7 +59,7 @@ export default async function RecommendationDetailPage({
       </Link>
 
       <Reveal>
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
+        <div className="rounded-2xl border bg-gradient-to-br from-card to-teal-50/50 p-5 shadow-sm sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h1 className="text-xl font-semibold text-foreground">{rec.companyName}</h1>
@@ -71,7 +71,7 @@ export default async function RecommendationDetailPage({
           <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs text-muted-foreground">{closed ? "Sold at" : "Current price"}</p>
-              <p className="text-3xl font-semibold tracking-tight text-foreground">{formatInr(exitPrice)}</p>
+              <p className="text-4xl font-semibold tracking-tight text-foreground">{formatInr(exitPrice)}</p>
               <p className="text-sm text-muted-foreground">from {formatInr(rec.purchasePrice)} buy price</p>
             </div>
             <div className="text-right">
@@ -97,7 +97,7 @@ export default async function RecommendationDetailPage({
       </Reveal>
 
       <Reveal delay={0.1}>
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
+        <div className="rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
           <h2 className="mb-1 text-sm font-semibold text-foreground">Recommendation Timeline</h2>
           <p className="mb-5 text-xs text-muted-foreground">
             {closed ? "This recommendation has been closed." : "This recommendation is currently open."}
@@ -107,7 +107,7 @@ export default async function RecommendationDetailPage({
       </Reveal>
 
       <Reveal delay={0.15}>
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
+        <div className="rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
           <h2 className="mb-1 text-sm font-semibold text-foreground">Details</h2>
           <div className="divide-y">
             <DetailRow label="Purchase price" value={formatInr(rec.purchasePrice)} />

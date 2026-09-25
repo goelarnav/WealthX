@@ -25,8 +25,8 @@ export function UserMenu({ name, phone }: { name: string; phone: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
-        <Avatar className="size-8">
-          <AvatarFallback className="bg-teal-100 text-xs font-semibold text-teal-800">
+        <Avatar className="size-8 ring-2 ring-teal-100 transition-shadow hover:ring-teal-200">
+          <AvatarFallback className="bg-gradient-to-br from-teal-100 to-teal-200 text-xs font-semibold text-teal-800">
             {initials(name)}
           </AvatarFallback>
         </Avatar>

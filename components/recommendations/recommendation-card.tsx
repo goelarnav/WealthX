@@ -19,7 +19,7 @@ export function RecommendationCard({
   return (
     <Link
       href={`/recommendations/${rec.id}`}
-      className="block rounded-xl border bg-card p-4 transition-colors active:bg-muted/40"
+      className="block rounded-xl border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:bg-muted/40"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
