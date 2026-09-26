@@ -32,9 +32,8 @@ export async function getRecommendationById(id: string): Promise<Recommendation 
 }
 
 // --- Admin-facing writes -----------------------------------------------
-// No admin UI in this MVP, but the dashboard is only ever a reader of this
-// data, so these are the seams a future admin panel (or a scheduled CMP
-// updater, or a CSV importer) will call into.
+// Used by app/admin (gated by requireAdminSession()) and the scheduled CMP
+// refresh job. The dashboard itself only ever reads this data.
 
 export interface CreateRecommendationInput {
   companyName: string;

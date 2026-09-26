@@ -53,6 +53,16 @@ use "Create an account" to sign up. OTPs are mocked — the 6-digit code is
 shown on screen ("Dev mode — your code is ...") and logged to the server
 console, so no SMS provider is needed to test the flow.
 
+To manage recommendations, go to [http://localhost:3000/admin](http://localhost:3000/admin)
+— it redirects straight to a login form, entirely separate from customer
+accounts. Log in with `ADMIN_USERNAME` / the plaintext password behind
+`ADMIN_PASSWORD_HASH` in your `.env`. To set your own password:
+
+```bash
+npm run admin:hash-password -- "your-new-password"
+# paste the printed hash into ADMIN_PASSWORD_HASH in .env, restart the dev server
+```
+
 ## Environment variables
 
 | Variable | Description |
@@ -63,6 +73,8 @@ console, so no SMS provider is needed to test the flow.
 | `OTP_TTL_SECONDS` | How long an OTP stays valid (default 300) |
 | `MARKET_DATA_PROVIDER` | `yahoo` (default, no key needed) — see `lib/market/price-provider.ts` |
 | `MARKET_REFRESH_SECRET` | Bearer token a scheduler must send to `POST /api/market/refresh` |
+| `ADMIN_USERNAME` | Username for `/admin/login` |
+| `ADMIN_PASSWORD_HASH` | bcrypt hash of the admin password (`npm run admin:hash-password -- "..."`) |
 
 ## Project structure
 
@@ -70,6 +82,8 @@ console, so no SMS provider is needed to test the flow.
 app/
   login/                  phone + PIN login, "forgot PIN" wizard
   signup/                 phone → OTP → create-profile wizard
+  admin/                  separate area: own login, no customer session needed
+    login/                username + password form
   api/market/refresh/     cron-facing endpoint that pulls live CMPs
   (app)/                  authenticated shell (header, mobile nav)
     dashboard/            main recommendations dashboard
@@ -82,23 +96,26 @@ components/
   navigation/             header, mobile bottom nav, "More" dropdown, user menu
   recommendations/        summary cards, filters, table (desktop), cards (mobile)
   investments/            invest/exit dialogs, position panel, portfolio list
+  admin/                  login form, add/update-CMP/close dialogs, admin table
   profile/                edit-profile and change-PIN dialogs
   calculators/            shared "coming soon" placeholder
   motion/                 small Motion wrappers (page reveal, step transitions)
   ui/                     shadcn/ui primitives
 lib/
-  auth/                   OTP issuing/verification, PIN hashing, sessions, rate limiting
+  auth/                   OTP issuing/verification, PIN hashing, customer + admin
+                          sessions, rate limiting
   db/                     Prisma client
   recommendations/        repository (Prisma) + derived-value helpers (gain %, days held)
   investments/            repository + derived-value helpers (P&L, holding days)
   market/                 price-provider abstraction, Yahoo Finance client, refresh job
-  validators/             zod schemas for phone/OTP/PIN/name/amount
+  validators/             zod schemas for phone/OTP/PIN/name/amount/recommendation/admin
   calculators.ts          single source of truth for the 6 calculator routes
 prisma/
   schema.prisma
   seed.ts
 scripts/
   refresh-prices.ts       manual/cron entry point for the price refresh job
+  hash-admin-password.ts  prints a bcrypt hash for ADMIN_PASSWORD_HASH
 ```
 
 ## Architecture notes
@@ -120,10 +137,26 @@ signed JWT in an httpOnly cookie (`lib/auth/session.ts`); `proxy.ts`
 facts (prices, dates, status). Gain %, days held, and open/closed framing
 are computed on read in `lib/recommendations/derive.ts` rather than stored,
 so they can never drift out of sync with the underlying prices. The
-repository (`lib/recommendations/repository.ts`) already exposes
+repository (`lib/recommendations/repository.ts`) exposes
 `createRecommendation` / `updateCurrentPrice` / `closeRecommendation` /
-`importRecommendations` — no admin UI yet, but the seams are there for one,
-and for a future Excel/CSV import.
+`importRecommendations`; `/admin` is a thin UI over the first three, and
+`importRecommendations` is still an open seam for a future Excel/CSV
+import.
+
+**Admin.** Deliberately not part of the customer auth system at all — no
+`User` row is ever "an admin." `/admin/login` checks a username/password
+against `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` in the environment
+(`lib/auth/admin-session.ts`) and, on success, sets its own signed JWT
+cookie (`wealthx_admin_session`, 12h expiry) — a completely separate cookie
+from the customer `wealthx_session`, so being logged in as a customer
+grants no admin access and vice versa. `proxy.ts` branches on the `/admin`
+prefix before any customer-auth logic runs, redirecting straight to
+`/admin/login` when that cookie is missing/invalid; every `/admin` Server
+Action also calls `requireAdminSession()` itself as defense-in-depth, same
+pattern as `requireUser()` for customers. Login attempts are rate-limited
+per username (`lib/auth/rate-limit.ts`), same as customer login. A closed
+recommendation's admin controls disappear (nothing to update/close
+further), matching the read-only CLOSED state everywhere else in the app.
 
 **Personal investments ("My Stocks").** A recommendation is one shared,
 admin-owned record; an `Investment` is a user's own position in it, and the
@@ -155,7 +188,7 @@ one bad symbol can't take down the rest of the refresh.
 
 - Calculator logic (SIP/SWP/brokerage/margin/credit/pricing pages are
   placeholders by design — see spec)
-- Admin UI for managing recommendations (backend supports it; see above)
+- Excel/CSV import into recommendations (backend seam exists; see above)
 - Real SMS provider (swap into `lib/auth/otp-provider.ts`)
 - An actual scheduler calling `/api/market/refresh` (the endpoint and script
   exist; nothing cron's it yet)

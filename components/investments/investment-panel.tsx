@@ -49,7 +49,14 @@ export function InvestmentPanel({
     <div className="rounded-2xl border bg-gradient-to-br from-card to-teal-50/50 p-5 shadow-sm sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <h2 className="text-sm font-semibold text-foreground">Your position</h2>
-        <GainPill value={gainPercent} />
+        <div className="flex items-center gap-3">
+          <GainPill value={gainPercent} />
+          <ExitDialog
+            investmentId={activeInvestment.id}
+            companyName={companyName}
+            currentPrice={currentPrice}
+          />
+        </div>
       </div>
 
       <div className="mt-3 flex items-end justify-between">
@@ -73,14 +80,6 @@ export function InvestmentPanel({
           <span className="text-muted-foreground">Held</span>
           <span className="font-medium text-foreground">{getHoldingDays(activeInvestment)} days</span>
         </div>
-      </div>
-
-      <div className="mt-4">
-        <ExitDialog
-          investmentId={activeInvestment.id}
-          companyName={companyName}
-          currentPrice={currentPrice}
-        />
       </div>
     </div>
   );

@@ -57,7 +57,7 @@ export function ExitDialog({
         setError(null);
       }}
     >
-      <DialogTrigger render={<Button variant="outline">Exit position</Button>} />
+      <DialogTrigger render={<Button variant="destructive" size="sm">Exit position</Button>} />
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Exit {companyName}</DialogTitle>
@@ -86,7 +86,11 @@ export function ExitDialog({
 
         <DialogFooter>
           <DialogClose render={<Button variant="ghost" disabled={isPending}>Cancel</Button>} />
-          <Button onClick={submit} disabled={isPending || !(Number(exitPrice) > 0)}>
+          <Button
+            variant="destructive"
+            onClick={submit}
+            disabled={isPending || !(Number(exitPrice) > 0)}
+          >
             {isPending ? "Recording…" : "Confirm exit"}
           </Button>
         </DialogFooter>

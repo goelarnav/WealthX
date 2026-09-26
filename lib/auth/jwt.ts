@@ -7,6 +7,10 @@ export const SESSION_COOKIE = "wealthx_session";
 export const SIGNUP_COOKIE = "wealthx_signup";
 export const PIN_RESET_COOKIE = "wealthx_pin_reset";
 
+// Entirely separate from the customer session cookie above — the admin
+// area has its own username/password login, not tied to any User row.
+export const ADMIN_SESSION_COOKIE = "wealthx_admin_session";
+
 function secretKey() {
   const secret = process.env.AUTH_SECRET;
   if (!secret) throw new Error("AUTH_SECRET environment variable is not set");

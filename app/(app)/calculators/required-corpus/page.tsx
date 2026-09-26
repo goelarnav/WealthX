@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import { getCalculator } from "@/lib/calculators";
 import { CalculatorHeader } from "@/components/calculators/calculator-header";
-import { SipCalculator } from "@/components/calculators/sip/sip-calculator";
+import { RequiredCorpusCalculator } from "@/components/calculators/required-corpus/required-corpus-calculator";
 import { Reveal } from "@/components/motion/reveal";
 
-const calculator = getCalculator("sip")!;
+const calculator = getCalculator("required-corpus")!;
 
 export const metadata: Metadata = { title: `${calculator.name} — WealthX` };
 
-export default function SipCalculatorPage() {
+export default function RequiredCorpusCalculatorPage() {
   return (
     <div className="space-y-6">
       <Reveal>
         <CalculatorHeader calculator={calculator} />
       </Reveal>
       <Reveal delay={0.05}>
-        <SipCalculator />
+        <RequiredCorpusCalculator />
       </Reveal>
     </div>
   );

@@ -1,4 +1,4 @@
-import { PiggyBank, Wallet, Receipt, Scale, CreditCard, Tag, type LucideIcon } from "lucide-react";
+import { PiggyBank, Wallet, Receipt, Scale, CreditCard, Tag, Target, type LucideIcon } from "lucide-react";
 
 export interface CalculatorMeta {
   slug: string;
@@ -14,13 +14,13 @@ export const CALCULATORS: CalculatorMeta[] = [
   {
     slug: "sip",
     name: "SIP Calculator",
-    description: "Estimate the future value of your monthly SIP investments.",
+    description: "Find the monthly SIP needed to hit a target corpus by retirement.",
     icon: PiggyBank,
   },
   {
     slug: "swp",
     name: "SWP Calculator",
-    description: "Plan systematic withdrawals from your investment corpus.",
+    description: "See how long your corpus lasts against retirement withdrawals.",
     icon: Wallet,
   },
   {
@@ -46,6 +46,12 @@ export const CALCULATORS: CalculatorMeta[] = [
     name: "Pricing / Charges Calculator",
     description: "Break down platform fees and other charges.",
     icon: Tag,
+  },
+  {
+    slug: "required-corpus",
+    name: "Required Corpus Calculator",
+    description: "Work out the retirement corpus your expenses will need.",
+    icon: Target,
   },
 ];
 
