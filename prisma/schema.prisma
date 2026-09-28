@@ -72,6 +72,12 @@ model StockRecommendation {
   dayChangePercent Decimal? @db.Decimal(6, 2)
   purchaseDate     DateTime
 
+  // Optional admin guidance shown alongside a recommendation — never used
+  // in gain/derived-figure math, purely informational for the viewer.
+  targetPrice   Decimal? @db.Decimal(10, 2)
+  stopLoss      Decimal? @db.Decimal(10, 2)
+  holdingPeriod String?
+
   status RecommendationStatus @default(OPEN)
 
   sellDate  DateTime?

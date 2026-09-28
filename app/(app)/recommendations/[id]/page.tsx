@@ -118,6 +118,9 @@ export default async function RecommendationDetailPage({
             />
             <DetailRow label={closed ? "Final gain" : "Current gain"} value={formatPercent(gainPercent)} />
             <DetailRow label="Purchase date" value={formatDate(rec.purchaseDate)} />
+            {rec.targetPrice != null ? <DetailRow label="Target price" value={formatInr(rec.targetPrice)} /> : null}
+            {rec.stopLoss != null ? <DetailRow label="Stop loss" value={formatInr(rec.stopLoss)} /> : null}
+            {rec.holdingPeriod ? <DetailRow label="Suggested holding period" value={rec.holdingPeriod} /> : null}
             {closed ? (
               <>
                 <DetailRow label="Sell date" value={rec.sellDate ? formatDate(rec.sellDate) : "–"} />

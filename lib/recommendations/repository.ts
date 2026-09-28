@@ -11,6 +11,9 @@ function toDTO(row: PrismaRecommendation): Recommendation {
     currentPrice: row.currentPrice.toNumber(),
     dayChangePercent: row.dayChangePercent ? row.dayChangePercent.toNumber() : null,
     purchaseDate: row.purchaseDate,
+    targetPrice: row.targetPrice ? row.targetPrice.toNumber() : null,
+    stopLoss: row.stopLoss ? row.stopLoss.toNumber() : null,
+    holdingPeriod: row.holdingPeriod,
     status: row.status,
     sellDate: row.sellDate,
     sellPrice: row.sellPrice ? row.sellPrice.toNumber() : null,
@@ -42,6 +45,9 @@ export interface CreateRecommendationInput {
   currentPrice: number;
   dayChangePercent?: number | null;
   purchaseDate: Date;
+  targetPrice?: number | null;
+  stopLoss?: number | null;
+  holdingPeriod?: string | null;
   status?: RecommendationStatus;
   sellDate?: Date | null;
   sellPrice?: number | null;
@@ -58,6 +64,9 @@ export async function createRecommendation(
       currentPrice: input.currentPrice,
       dayChangePercent: input.dayChangePercent ?? null,
       purchaseDate: input.purchaseDate,
+      targetPrice: input.targetPrice ?? null,
+      stopLoss: input.stopLoss ?? null,
+      holdingPeriod: input.holdingPeriod ?? null,
       status: input.status ?? "OPEN",
       sellDate: input.sellDate ?? null,
       sellPrice: input.sellPrice ?? null,

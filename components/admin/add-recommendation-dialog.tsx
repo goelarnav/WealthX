@@ -28,6 +28,9 @@ export function AddRecommendationDialog() {
   const [nseCode, setNseCode] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(today());
+  const [targetPrice, setTargetPrice] = useState("");
+  const [stopLoss, setStopLoss] = useState("");
+  const [holdingPeriod, setHoldingPeriod] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -36,13 +39,24 @@ export function AddRecommendationDialog() {
     setNseCode("");
     setPurchasePrice("");
     setPurchaseDate(today());
+    setTargetPrice("");
+    setStopLoss("");
+    setHoldingPeriod("");
     setError(null);
   }
 
   function submit() {
     setError(null);
     startTransition(async () => {
-      const result = await addRecommendation({ companyName, nseCode, purchasePrice, purchaseDate });
+      const result = await addRecommendation({
+        companyName,
+        nseCode,
+        purchasePrice,
+        purchaseDate,
+        targetPrice,
+        stopLoss,
+        holdingPeriod,
+      });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -116,6 +130,48 @@ export function AddRecommendationDialog() {
                 disabled={isPending}
               />
             </div>
+          </div>
+
+          <p className="pt-1 text-xs font-medium text-muted-foreground">Optional</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="add-target-price">Target price (₹)</Label>
+              <Input
+                id="add-target-price"
+                type="number"
+                inputMode="decimal"
+                min="0.01"
+                step="0.01"
+                placeholder="1200"
+                value={targetPrice}
+                onChange={(event) => setTargetPrice(event.target.value)}
+                disabled={isPending}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-stop-loss">Stop loss (₹)</Label>
+              <Input
+                id="add-stop-loss"
+                type="number"
+                inputMode="decimal"
+                min="0.01"
+                step="0.01"
+                placeholder="750"
+                value={stopLoss}
+                onChange={(event) => setStopLoss(event.target.value)}
+                disabled={isPending}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="add-holding-period">Suggested holding period</Label>
+            <Input
+              id="add-holding-period"
+              placeholder="6-12 months"
+              value={holdingPeriod}
+              onChange={(event) => setHoldingPeriod(event.target.value)}
+              disabled={isPending}
+            />
           </div>
         </div>
 

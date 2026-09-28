@@ -17,6 +17,9 @@ export interface Recommendation {
   currentPrice: number;
   dayChangePercent: number | null;
   purchaseDate: Date;
+  targetPrice: number | null;
+  stopLoss: number | null;
+  holdingPeriod: string | null;
   status: RecommendationStatus;
   sellDate: Date | null;
   sellPrice: number | null;

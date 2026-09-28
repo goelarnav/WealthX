@@ -1,4 +1,4 @@
-import { PiggyBank, Wallet, Receipt, Scale, CreditCard, Tag, Target, type LucideIcon } from "lucide-react";
+import { PiggyBank, Wallet, Receipt, Scale, CreditCard, Tag, Target, GitCompareArrows, type LucideIcon } from "lucide-react";
 
 export interface CalculatorMeta {
   slug: string;
@@ -52,6 +52,12 @@ export const CALCULATORS: CalculatorMeta[] = [
     name: "Required Corpus Calculator",
     description: "Work out the retirement corpus your expenses will need.",
     icon: Target,
+  },
+  {
+    slug: "compounding-edge",
+    name: "Compounding Edge Calculator",
+    description: "Compare two what-if plans — return, step-up, and contribution — side by side.",
+    icon: GitCompareArrows,
   },
 ];
 

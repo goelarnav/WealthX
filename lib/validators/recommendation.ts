@@ -10,6 +10,18 @@ export const createRecommendationSchema = z.object({
     .transform((value) => value.toUpperCase()),
   purchasePrice: z.coerce.number().positive("Enter a valid purchase price"),
   purchaseDate: z.coerce.date(),
+  targetPrice: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z.coerce.number().positive("Enter a valid target price").optional(),
+  ),
+  stopLoss: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z.coerce.number().positive("Enter a valid stop loss").optional(),
+  ),
+  holdingPeriod: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z.string().trim().max(60).optional(),
+  ),
 });
 
 export const updateCmpSchema = z.object({

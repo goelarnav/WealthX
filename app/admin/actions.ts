@@ -26,6 +26,9 @@ export async function addRecommendation(input: {
   nseCode: string;
   purchasePrice: string;
   purchaseDate: string;
+  targetPrice?: string;
+  stopLoss?: string;
+  holdingPeriod?: string;
 }): Promise<ActionResult> {
   await requireAdminSession();
 
@@ -40,6 +43,9 @@ export async function addRecommendation(input: {
     purchasePrice: parsed.data.purchasePrice,
     currentPrice: parsed.data.purchasePrice,
     purchaseDate: parsed.data.purchaseDate,
+    targetPrice: parsed.data.targetPrice ?? null,
+    stopLoss: parsed.data.stopLoss ?? null,
+    holdingPeriod: parsed.data.holdingPeriod ?? null,
   });
 
   revalidateRecommendationPaths();
