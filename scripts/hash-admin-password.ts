@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 
-// Prints a bcrypt hash to paste into ADMIN_PASSWORD_HASH in .env.
+// Prints a bcrypt hash to paste into ADMIN_PW_HASH in .env.
 // Usage: npm run admin:hash-password -- "your-new-password"
 async function main() {
   const password = process.argv[2];
@@ -14,7 +14,7 @@ async function main() {
   // Next's env loader interpolates bare "$name" as a variable reference —
   // escape every "$" as "\$" so the hash survives .env loading intact.
   const escaped = hash.replace(/\$/g, "\\$");
-  console.log(`ADMIN_PASSWORD_HASH="${escaped}"`);
+  console.log(`ADMIN_PW_HASH="${escaped}"`);
 }
 
 main();

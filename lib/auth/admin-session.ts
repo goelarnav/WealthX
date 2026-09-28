@@ -8,15 +8,15 @@ const ADMIN_SESSION_TTL = "12h";
 const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
 
 /**
- * Checked against ADMIN_USERNAME / ADMIN_PASSWORD_HASH in the environment —
+ * Checked against ADMIN_USERNAME / ADMIN_PW_HASH in the environment —
  * there's no admin row in the database, on purpose. Generate a hash with
  * scripts/hash-admin-password.ts.
  */
 export async function verifyAdminCredentials(username: string, password: string): Promise<boolean> {
   const expectedUsername = process.env.ADMIN_USERNAME;
-  const expectedHash = process.env.ADMIN_PASSWORD_HASH;
+  const expectedHash = process.env.ADMIN_PW_HASH;
   if (!expectedUsername || !expectedHash) {
-    throw new Error("ADMIN_USERNAME / ADMIN_PASSWORD_HASH are not configured.");
+    throw new Error("ADMIN_USERNAME / ADMIN_PW_HASH are not configured.");
   }
 
   // Always run bcrypt.compare, even on a username mismatch, so a wrong

@@ -56,11 +56,11 @@ console, so no SMS provider is needed to test the flow.
 To manage recommendations, go to [http://localhost:3000/admin](http://localhost:3000/admin)
 — it redirects straight to a login form, entirely separate from customer
 accounts. Log in with `ADMIN_USERNAME` / the plaintext password behind
-`ADMIN_PASSWORD_HASH` in your `.env`. To set your own password:
+`ADMIN_PW_HASH` in your `.env`. To set your own password:
 
 ```bash
 npm run admin:hash-password -- "your-new-password"
-# paste the printed hash into ADMIN_PASSWORD_HASH in .env, restart the dev server
+# paste the printed hash into ADMIN_PW_HASH in .env, restart the dev server
 ```
 
 ## Environment variables
@@ -74,7 +74,7 @@ npm run admin:hash-password -- "your-new-password"
 | `MARKET_DATA_PROVIDER` | `yahoo` (default, no key needed) — see `lib/market/price-provider.ts` |
 | `MARKET_REFRESH_SECRET` | Bearer token a scheduler must send to `POST /api/market/refresh` |
 | `ADMIN_USERNAME` | Username for `/admin/login` |
-| `ADMIN_PASSWORD_HASH` | bcrypt hash of the admin password (`npm run admin:hash-password -- "..."`) |
+| `ADMIN_PW_HASH` | bcrypt hash of the admin password (`npm run admin:hash-password -- "..."`) |
 
 ## Project structure
 
@@ -115,7 +115,7 @@ prisma/
   seed.ts
 scripts/
   refresh-prices.ts       manual/cron entry point for the price refresh job
-  hash-admin-password.ts  prints a bcrypt hash for ADMIN_PASSWORD_HASH
+  hash-admin-password.ts  prints a bcrypt hash for ADMIN_PW_HASH
 ```
 
 ## Architecture notes
@@ -145,7 +145,7 @@ import.
 
 **Admin.** Deliberately not part of the customer auth system at all — no
 `User` row is ever "an admin." `/admin/login` checks a username/password
-against `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` in the environment
+against `ADMIN_USERNAME` / `ADMIN_PW_HASH` in the environment
 (`lib/auth/admin-session.ts`) and, on success, sets its own signed JWT
 cookie (`wealthx_admin_session`, 12h expiry) — a completely separate cookie
 from the customer `wealthx_session`, so being logged in as a customer
